@@ -289,10 +289,39 @@
   speech.onResult = (transcript) => {
     VUI.Overlay.setTranscript(transcript);
 
-    const command =
+    const parsedCommand =
       VUI.CommandParser.parse(transcript);
 
-    executeCommand(command);
+    if (parsedCommand.action !== "unknown") {
+      executeCommand(parsedCommand);
+      return;
+    }
+
+    VUI.Overlay.setStatus("Interpreting with local model...");
+
+    const elements =
+      VUI.PageAnalyzer.getInteractiveElements()
+        .slice(0, 80)
+        .map((item, index) => ({
+          index: index + 1,
+          role: item.role,
+          name: item.name.slice(0, 120)
+        }));
+
+    VUI.OllamaParser.parse(transcript, elements)
+      .then(command => {
+        if (command.action === "unknown") {
+          executeCommand({ ...command, text: transcript });
+          return;
+        }
+
+        executeCommand(command);
+      })
+      .catch(error => {
+        const detail = error?.message || "Unknown local model error.";
+        console.error("Local command interpretation failed:", error);
+        speakAndShow(`Local command interpretation failed: ${detail}`);
+      });
   };
 
   speech.onError = (error) => {

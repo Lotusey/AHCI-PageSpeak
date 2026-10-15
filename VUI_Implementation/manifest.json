@@ -3,10 +3,14 @@
   "name": "Voice Web Navigation",
   "version": "0.1.0",
   "description": "Voice-first webpage navigation using the Web Speech API.",
+  "background": {
+    "service_worker": "src/background.js"
+  },
   "permissions": [],
   "host_permissions": [
     "https://*/*",
-    "http://*/*"
+    "http://*/*",
+    "http://127.0.0.1:11434/*"
   ],
   "content_scripts": [
     {
@@ -21,6 +25,7 @@
         "src/pageAnalyzer.js",
         "src/actionEngine.js",
         "src/commandParser.js",
+        "src/ollamaParser.js",
         "src/speech.js",
         "src/overlay.js",
         "src/content.js"
