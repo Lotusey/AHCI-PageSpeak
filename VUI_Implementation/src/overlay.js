@@ -1,5 +1,6 @@
 (() => {
   window.VUI = window.VUI || {};
+  const highlightedElements = new Set();
 
   function createOverlay() {
     if (document.getElementById("vui-overlay")) {
@@ -124,10 +125,22 @@
     });
 
     element.classList.add("vui-highlight");
+    highlightedElements.add(element);
+  }
 
-    setTimeout(() => {
+  function highlightVisibleElements(items) {
+    items.forEach(item => {
+      const element = item.element;
+      element.classList.add("vui-highlight");
+      highlightedElements.add(element);
+    });
+  }
+
+  function clearHighlights() {
+    highlightedElements.forEach(element => {
       element.classList.remove("vui-highlight");
-    }, 1500);
+    });
+    highlightedElements.clear();
   }
 
   window.VUI.Overlay = {
@@ -136,6 +149,8 @@
     setTranscript,
     showList,
     clearResults,
-    highlightElement
+    highlightElement,
+    highlightVisibleElements,
+    clearHighlights,
   };
 })();

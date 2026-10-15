@@ -9,17 +9,15 @@ The VUI implementation keeps its rule-based command parser as the fast path. If 
 
 2. Download the configured model once in PowerShell:
 
-	```powershell
+	powershell:
 	ollama pull llama3.2:3b
-	```
 
 3. In Chrome, open `chrome://extensions`, enable Developer mode, choose **Load unpacked**, and select the `VUI_Implementation` folder. Copy the extension ID shown on its card.
 
 4. Ollama must allow this extension's origin. In Windows, open **Edit environment variables for your account** and add a user variable named `OLLAMA_ORIGINS` with this value, replacing the placeholder with the copied extension ID:
 
-	```text
+	text:
 	chrome-extension://YOUR_EXTENSION_ID
-	```
 
 5. Quit Ollama from its system-tray menu and reopen it so the environment setting takes effect. Ollama for Windows normally runs in the background; do not start a second `ollama serve` process if it is already running.
 

@@ -25,6 +25,27 @@
     return null;
   }
 
+  function elementReference(value) {
+    let target = value.trim();
+    let targetType = null;
+    const categoryPattern = /^(links?|buttons?)\s+(.+)$|^(.+?)\s+(links?|buttons?)$/;
+    const categoryMatch = target.match(categoryPattern);
+
+    if (categoryMatch) {
+      const category = categoryMatch[1] || categoryMatch[4];
+      targetType = category.startsWith("link") ? "links" : "buttons";
+      target = categoryMatch[2] || categoryMatch[3];
+    }
+
+    const index = numberFromText(target);
+
+    return {
+      target: index === null ? target : targetType === "links" ? "link" : targetType === "buttons" ? "button" : target,
+      targetType,
+      index
+    };
+  }
+
   function parse(text) {
     const command = normalize(text);
 
@@ -87,6 +108,24 @@
       }
     }
 
+    const absolutePercent = command.match(
+      /^(?:(?:can you|please) )?(?:scroll to|go to|move to|take me to) (\d{1,3})\s*(?:%|percent)(?: of (?:the )?page)?$/
+    );
+    const absoluteHalf = command.match(
+      /^(?:(?:can you|please) )?(?:scroll to|go to|move to|take me to) (half|middle)(?: of (?:the )?page)?$/
+    );
+
+    if (absolutePercent || absoluteHalf) {
+      const percent = absoluteHalf ? 50 : Number(absolutePercent[1]);
+
+      if (percent <= 100) {
+        return {
+          action: "scrollToPercent",
+          percent
+        };
+      }
+    }
+
     const scrollToPercent = command.match(
       /^(?:scroll to|go to) (\d{1,3})%(?: of the page)?$/
     );
@@ -95,10 +134,7 @@
       const percent = Number(scrollToPercent[1]);
 
       if (percent <= 100) {
-        return {
-          action: "scrollToPercent",
-          percent
-        };
+        return { action: "scrollToPercent", percent };
       }
     }
 
@@ -139,9 +175,32 @@
     }
 
     if (
-      command === "show links" ||
-      command === "list links"
+      command === "hide links" ||
+      command === "hide the links"
     ) {
+      return { action: "hideLinks" };
+    }
+
+    if ([
+      "highlight links on current screen",
+      "highlight the links on the current screen",
+      "highlight visible links",
+      "show visible links",
+      "list visible links",
+      "show links on screen",
+      "show links on the screen"
+    ].includes(command)) {
+      return { action: "listVisibleLinks" };
+    }
+
+    if (command === "show links" || command === "list links") {
+      return {
+        action: "list",
+        type: "links"
+      };
+    }
+
+    if (["show all links", "list all links", "all links"].includes(command)) {
       return {
         action: "list",
         type: "links"
@@ -179,18 +238,33 @@
       };
     }
 
+    const highlightMatch = command.match(
+      /^highlight\s+(?:the\s+)?(.+)$/
+    );
+
+    if (highlightMatch) {
+      const reference = elementReference(highlightMatch[1]);
+
+      return {
+        action: "highlight",
+        target: reference.target,
+        targetType: reference.targetType,
+        index: reference.index
+      };
+    }
+
     const clickMatch = command.match(
-      /^(?:click|open|activate)\s+(?:the\s+)?(.+)$/
+      /^(?:click|open|activate|select)\s+(?:the\s+)?(.+)$/
     );
 
     if (clickMatch) {
-      const target = clickMatch[1];
-      const index = numberFromText(target);
+      const reference = elementReference(clickMatch[1]);
 
       return {
         action: "click",
-        target,
-        index
+        target: reference.target,
+        targetType: reference.targetType,
+        index: reference.index
       };
     }
 
@@ -199,13 +273,13 @@
     );
 
     if (focusMatch) {
-      const target = focusMatch[1];
-      const index = numberFromText(target);
+      const reference = elementReference(focusMatch[1]);
 
       return {
         action: "focus",
-        target,
-        index
+        target: reference.target,
+        targetType: reference.targetType,
+        index: reference.index
       };
     }
 

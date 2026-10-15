@@ -22,6 +22,19 @@
     );
   }
 
+  function isInViewport(element) {
+    if (!isVisible(element)) return false;
+
+    const rect = element.getBoundingClientRect();
+
+    return (
+      rect.bottom > 0 &&
+      rect.right > 0 &&
+      rect.top < window.innerHeight &&
+      rect.left < window.innerWidth
+    );
+  }
+
   function cleanText(value) {
     return (value || "")
       .replace(/\s+/g, " ")
@@ -91,6 +104,11 @@
       }));
   }
 
+  function getVisibleElementsByType(type) {
+    return getElementsByType(type)
+      .filter(item => isInViewport(item.element));
+  }
+
   function getInteractiveElements() {
     const selector = [
       "a[href]",
@@ -120,7 +138,9 @@
 
     let candidates;
 
-    if (type) {
+    if (type === "focusables") {
+      candidates = getInteractiveElements();
+    } else if (type) {
       candidates = getElementsByType(type);
     } else {
       candidates = getInteractiveElements();
@@ -159,6 +179,7 @@
     getName,
     getRole,
     getElementsByType,
+    getVisibleElementsByType,
     getInteractiveElements,
     findByName,
     getPageSummary

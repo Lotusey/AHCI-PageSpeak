@@ -14,6 +14,8 @@
   const closeButton =
     document.getElementById("vui-close");
 
+  let shownListType = null;
+
   if (!speech.isSupported()) {
     VUI.Overlay.setStatus(
       "Speech recognition is not supported in this browser."
@@ -26,6 +28,10 @@
   }
 
   function getTargetList(type) {
+    if (type === "focusables") {
+      return VUI.PageAnalyzer.getInteractiveElements();
+    }
+
     return VUI.PageAnalyzer.getElementsByType(type);
   }
 
@@ -129,6 +135,7 @@
           getTargetList(command.type);
 
         VUI.Overlay.showList(items);
+        shownListType = command.type;
 
         VUI.Overlay.setStatus(
           `Found ${items.length} ${command.type}`
@@ -141,10 +148,56 @@
         return;
       }
 
+      case "listVisibleLinks": {
+        const items =
+          VUI.PageAnalyzer.getVisibleElementsByType("links");
+
+        VUI.Overlay.showList(items);
+        VUI.Overlay.highlightVisibleElements(items);
+        shownListType = "links";
+        VUI.Overlay.setStatus(`Found ${items.length} visible links`);
+        VUI.speak(`${items.length} visible links found.`);
+        return;
+      }
+
+      case "hideLinks":
+        if (shownListType !== "links") {
+          speakAndShow("Cannot hide links without links being shown.");
+          return;
+        }
+
+        VUI.Overlay.clearResults();
+        shownListType = null;
+        speakAndShow("Links hidden.");
+        return;
+
+      case "highlight": {
+        const items = command.targetType
+          ? getTargetList(command.targetType)
+          : VUI.PageAnalyzer.getInteractiveElements();
+        const target = command.index
+          ? items[command.index - 1]
+          : VUI.PageAnalyzer.findByName(
+              command.target,
+              command.targetType || null
+            );
+
+        if (!target) {
+          speakAndShow(`I could not find ${command.target}.`);
+          return;
+        }
+
+        VUI.Overlay.highlightElement(target.element);
+        speakAndShow(`Highlighted ${target.name}.`);
+        return;
+      }
+
       case "click": {
         let items;
 
-        if (command.target === "link" || command.target === "links") {
+        if (command.targetType) {
+          items = getTargetList(command.targetType);
+        } else if (command.target === "link" || command.target === "links") {
           items = getTargetList("links");
         } else if (
           command.target === "button" ||
@@ -160,8 +213,10 @@
         if (command.index) {
           target = items[command.index - 1];
         } else {
-          target =
-            VUI.PageAnalyzer.findByName(command.target);
+          target = VUI.PageAnalyzer.findByName(
+            command.target,
+            command.targetType || null
+          );
         }
 
         if (!target) {
@@ -186,8 +241,9 @@
       }
 
       case "focus": {
-        const interactiveElements =
-          VUI.PageAnalyzer.getInteractiveElements();
+        const interactiveElements = command.targetType
+          ? getTargetList(command.targetType)
+          : VUI.PageAnalyzer.getInteractiveElements();
 
         let target = null;
 
@@ -197,7 +253,8 @@
         } else {
           target =
             VUI.PageAnalyzer.findByName(
-              command.target
+              command.target,
+              command.targetType || null
             );
         }
 
@@ -287,6 +344,7 @@
   };
 
   speech.onResult = (transcript) => {
+    VUI.Overlay.clearHighlights();
     VUI.Overlay.setTranscript(transcript);
 
     const parsedCommand =
@@ -299,16 +357,19 @@
 
     VUI.Overlay.setStatus("Interpreting with local model...");
 
-    const elements =
-      VUI.PageAnalyzer.getInteractiveElements()
-        .slice(0, 80)
-        .map((item, index) => ({
-          index: index + 1,
-          role: item.role,
-          name: item.name.slice(0, 120)
-        }));
+    const targets = {
+      links: getTargetList("links")
+        .slice(0, 100)
+        .map(item => ({ role: item.role, name: item.name.slice(0, 120) })),
+      buttons: getTargetList("buttons")
+        .slice(0, 100)
+        .map(item => ({ role: item.role, name: item.name.slice(0, 120) })),
+      focusables: VUI.PageAnalyzer.getInteractiveElements()
+        .slice(0, 100)
+        .map(item => ({ role: item.role, name: item.name.slice(0, 120) }))
+    };
 
-    VUI.OllamaParser.parse(transcript, elements)
+    VUI.OllamaParser.parse(transcript, targets)
       .then(command => {
         if (command.action === "unknown") {
           executeCommand({ ...command, text: transcript });
