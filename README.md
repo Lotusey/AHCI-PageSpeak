@@ -19,7 +19,7 @@ PageSpeak combines a voice user interface (VUI) with an on-page graphical user i
 
 ## Requirements
 
-- Google Chrome or another Chromium-based browser.
+- Google Chrome or another browser.
 - A copy of this repository.
 - A microphone for voice commands.
 - Ollama is optional. The rule-based commands work without it.
@@ -28,23 +28,24 @@ PageSpeak combines a voice user interface (VUI) with an on-page graphical user i
 
 ### 1. Get the project
 
-Clone the repository or download it, then open PowerShell in the project folder:
+Clone the repository or download it. Then open PowerShell in the project folder. If you cloned it with Git, use:
 
 ```powershell
-cd C:\Users\hanna\Downloads\AHCI-PageSpeak
+git clone https://github.com/Lotusey/AHCI-PageSpeak.git
+cd AHCI-PageSpeak
 ```
 
-The folder you select later must contain `manifest.json`.
+If you downloaded a ZIP file, extract it, open PowerShell in the extracted project folder, and skip the `git clone` command. The folder you select later must contain `manifest.json`.
 
 ### 2. Load the extension in Chrome
 
 1. Open `chrome://extensions`.
 2. Turn on **Developer mode**.
 3. Click **Load unpacked**.
-4. Select the project folder:
+4. Select the extracted or cloned project folder—the folder containing `manifest.json`:
 
    ```text
-   C:\Users\hanna\Downloads\AHCI-PageSpeak
+   <your-project-folder>\AHCI-PageSpeak
    ```
 
 5. Open any normal `http://` or `https://` webpage. The **Voice Web Navigation** panel appears in the bottom-right corner.
