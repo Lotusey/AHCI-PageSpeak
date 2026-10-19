@@ -91,7 +91,7 @@
 
     const stylesheet = document.createElement("link");
     stylesheet.rel = "stylesheet";
-    stylesheet.href = chrome.runtime.getURL("src/styles.css");
+    stylesheet.href = chrome.runtime.getURL("GUI/styles.css");
     stylesheet.addEventListener("load", () => {
       container.style.visibility = "";
     });

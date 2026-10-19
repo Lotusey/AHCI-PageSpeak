@@ -1,11 +1,11 @@
 # AHCI-PageSpeak
 PageSpeak is a project built to bridge the gap between vocal commands and web page browsing through the integration of VUI and GUI controls. 
 
-The voice interface lives in `VUI_Implementation/`, a Chrome extension. It listens for a spoken command, maps it to a page action (scrolling, clicking, typing, and so on), and can put numbered labels on the buttons, links and inputs on screen so any of them can be reached by saying its number.
+The project is a Chrome extension. It listens for a spoken command, maps it to a page action (scrolling, clicking, typing, and so on), and can put numbered labels on the buttons, links and inputs on screen so any of them can be reached by saying its number.
 
 ## Installing the extension
 
-1. In Chrome, open `chrome://extensions`, enable Developer mode, choose **Load unpacked**, and select the `VUI_Implementation` folder.
+1. In Chrome, open `chrome://extensions`, enable Developer mode, choose **Load unpacked**, and select the `AHCI-PageSpeak` folder (the one containing `manifest.json`).
 2. Open any website. The Voice Web Navigation panel appears in the bottom-right corner.
 3. Press **Listen** and say a command.
 
@@ -84,7 +84,7 @@ The rule-based command parser is the fast path. If none of the recognized phrasi
 
 5. Quit Ollama from its system-tray menu and reopen it so the environment setting takes effect. Ollama for Windows normally runs in the background; do not start a second `ollama serve` process if it is already running.
 
-Ollama inference uses `http://127.0.0.1:11434` and does not require a paid model API. Requests time out after 15 seconds. The current speech transcription still uses the browser's Web Speech API, whose recognition may be provided by a browser service; local Ollama only guarantees that command interpretation stays on-device. The model and timeout can be changed in `VUI_Implementation/src/background.js`.
+Ollama inference uses `http://127.0.0.1:11434` and does not require a paid model API. Requests time out after 15 seconds. The current speech transcription still uses the browser's Web Speech API, whose recognition may be provided by a browser service; local Ollama only guarantees that command interpretation stays on-device. The model and timeout can be changed in `VUI/background.js`.
 
 ## Usage log for evaluation
 
@@ -92,16 +92,26 @@ Every voice command is logged locally (in the extension's `chrome.storage.local`
 
 ## Code overview
 
+`manifest.json` at the top level defines the extension and loads the files below.
+
+**`GUI/`: what is drawn on the page**
+
 | File | Purpose |
 | --- | --- |
-| `src/content.js` | Wires everything together: receives transcripts, resolves targets, runs commands, logs results. |
-| `src/commandParser.js` | Rule-based parser from spoken text to command objects. |
-| `src/ollamaParser.js` | Validates commands returned by the local model. |
-| `src/background.js` | Ollama requests, browser commands (tabs, zoom, search), and log storage. |
-| `src/speech.js` | Speech recognition (Web Speech API) and text-to-speech. |
-| `src/labels.js` | Assigns and maintains label numbers. |
-| `src/overlay.js` / `src/styles.css` | Panel, label badges and highlights, drawn inside a shadow root so page CSS cannot affect them. |
-| `src/pageAnalyzer.js` | Finds interactive elements, their names and visibility, and does fuzzy name matching. |
-| `src/actionEngine.js` | Performs page actions: click, focus, type, clear, check, choose option, key presses, scrolling. |
+| `GUI/overlay.js` / `GUI/styles.css` | Panel, label badges and highlights, drawn inside a shadow root so page CSS cannot affect them. |
+| `GUI/labels.js` | Assigns and maintains label numbers. |
+
+**`VUI/`: understanding speech and acting on it**
+
+| File | Purpose |
+| --- | --- |
+| `VUI/speech.js` | Speech recognition (Web Speech API) and text-to-speech. |
+| `VUI/commandParser.js` | Rule-based parser from spoken text to command objects. |
+| `VUI/ollamaParser.js` | Validates commands returned by the local model. |
+| `VUI/content.js` | Wires everything together: receives transcripts, resolves targets, runs commands, logs results. |
+| `VUI/pageAnalyzer.js` | Finds interactive elements, their names and visibility, and does fuzzy name matching. |
+| `VUI/actionEngine.js` | Performs page actions: click, focus, type, clear, check, choose option, key presses, scrolling. |
+| `VUI/background.js` | Ollama requests, browser commands (tabs, zoom, search), and log storage. |
+| `VUI/logger.js` | Sends each command's result to the usage log. |
 
 Known limitations: labels and commands only cover the top-level page, not content inside iframes. Custom (non-`<select>`) dropdowns are opened by clicking them and their options by name.

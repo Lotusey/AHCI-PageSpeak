@@ -4,7 +4,7 @@
   "version": "0.2.0",
   "description": "Voice-first webpage navigation with numbered on-page labels.",
   "background": {
-    "service_worker": "src/background.js"
+    "service_worker": "VUI/background.js"
   },
   "permissions": [
     "storage",
@@ -22,15 +22,15 @@
         "http://*/*"
       ],
       "js": [
-        "src/pageAnalyzer.js",
-        "src/actionEngine.js",
-        "src/commandParser.js",
-        "src/ollamaParser.js",
-        "src/speech.js",
-        "src/logger.js",
-        "src/overlay.js",
-        "src/labels.js",
-        "src/content.js"
+        "VUI/pageAnalyzer.js",
+        "VUI/actionEngine.js",
+        "VUI/commandParser.js",
+        "VUI/ollamaParser.js",
+        "VUI/speech.js",
+        "VUI/logger.js",
+        "GUI/overlay.js",
+        "GUI/labels.js",
+        "VUI/content.js"
       ],
       "run_at": "document_idle"
     }
@@ -38,7 +38,7 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "src/styles.css"
+        "GUI/styles.css"
       ],
       "matches": [
         "https://*/*",
