@@ -1,120 +1,178 @@
-# AHCI-PageSpeak
-PageSpeak is a project built to bridge the gap between vocal commands and web page browsing through the integration of VUI and GUI controls. 
+# PageSpeak
 
-The project is a Chrome extension. It listens for a spoken command, maps it to a page action (scrolling, clicking, typing, and so on), and can put numbered labels on the buttons, links and inputs on screen so any of them can be reached by saying its number.
+<p align="center">
+  <img src="icons/pagespeak.png" alt="PageSpeak logo" width="180">
+</p>
 
-## Installing the extension
+<p align="center"><strong>Voice-first webpage navigation for Chrome</strong></p>
 
-1. In Chrome, open `chrome://extensions`, enable Developer mode, choose **Load unpacked**, and select the `AHCI-PageSpeak` folder (the one containing `manifest.json`).
-2. Open any website. The Voice Web Navigation panel appears in the bottom-right corner.
-3. Press **Listen** and say a command. It keeps listening, so you can say as many commands as you like, with pauses in between, until you press **Stop**, press **Listen** again, or say "stop listening". Listening pauses while the extension is talking, so it does not mistake its own voice for a command, and while the tab is in the background.
+PageSpeak combines a voice user interface (VUI) with an on-page graphical user interface (GUI) to make webpages easier to browse. Speak a command to scroll, read, click, focus, type, search, or navigate. The extension can also place numbered labels on visible links, buttons, and form fields so you can reach them by voice.
 
-The first time you press **Listen** on a website, Chrome asks for permission to use the microphone.
+## What is included
 
-After pulling new changes, press the reload icon on the extension's card in `chrome://extensions` and reload any open tabs.
+- Chrome extension with a floating voice-control panel.
+- Browser speech recognition and text-to-speech.
+- Rule-based command parsing for fast, predictable commands.
+- Optional local Ollama interpretation for more conversational wording.
+- Numbered on-page labels and visual highlights.
+- Local usage logging for evaluation and user studies.
 
-## Voice commands
+## Requirements
 
-Say **"What can I say?"** at any time to see examples in the panel.
+- Google Chrome or another Chromium-based browser.
+- A copy of this repository.
+- A microphone for voice commands.
+- Ollama is optional. The rule-based commands work without it.
 
-### Labels
-| Say | What happens |
+## Install and run
+
+### 1. Get the project
+
+Clone the repository or download it, then open PowerShell in the project folder:
+
+```powershell
+cd C:\Users\hanna\Downloads\AHCI-PageSpeak
+```
+
+The folder you select later must contain `manifest.json`.
+
+### 2. Load the extension in Chrome
+
+1. Open `chrome://extensions`.
+2. Turn on **Developer mode**.
+3. Click **Load unpacked**.
+4. Select the project folder:
+
+   ```text
+   C:\Users\hanna\Downloads\AHCI-PageSpeak
+   ```
+
+5. Open any normal `http://` or `https://` webpage. The **Voice Web Navigation** panel appears in the bottom-right corner.
+6. Click **Listen** and allow microphone access when Chrome asks.
+
+After pulling new changes, click the reload icon on the extension card and reload any open webpages.
+
+### 3. Optional: enable conversational commands with Ollama
+
+The rule-based parser is the default fast path. Ollama is only needed when PageSpeak must interpret wording that does not match one of the built-in command patterns.
+
+1. Install [Ollama](https://ollama.com/download).
+2. Download the configured model:
+
+   ```powershell
+   & "$env:LOCALAPPDATA\Programs\Ollama\ollama.exe" pull llama3.2:3b
+   ```
+
+3. If Ollama is not already running, start it with:
+
+   ```powershell
+   & "$env:LOCALAPPDATA\Programs\Ollama\ollama.exe" serve
+   ```
+
+   Do not start a second server if Ollama is already running in the background.
+
+4. Copy the extension ID from the extension card in `chrome://extensions`.
+5. In Windows, open **Edit environment variables for your account** and add:
+
+   ```text
+   Variable: OLLAMA_ORIGINS
+   Value: chrome-extension://*
+   ```
+
+   The wildcard allows Chrome's extension origin reliably. A specific value such as `chrome-extension://YOUR_EXTENSION_ID` can also be used.
+
+6. Quit Ollama from its system-tray menu and reopen it so the environment variable takes effect.
+
+Ollama runs at `http://127.0.0.1:11434`. It does not require a paid API or token. The model and request timeout can be changed in [`VUI/background.js`](VUI/background.js).
+
+> **Privacy note:** PageSpeak's speech transcription uses the browser Web Speech API. Depending on the browser, recognition may use a browser-provided service. Ollama command interpretation remains on the local computer.
+
+## Try these commands
+
+Say **“What can I say?”** to display examples in the panel. Polite wording such as “can you” and “please” is supported.
+
+### Labels and targets
+
+| Say | Result |
 | --- | --- |
-| "show labels" / "show numbers" | Numbers every link, button and input on screen. Links are blue, buttons purple, inputs green. |
-| "show links" / "show buttons" / "show inputs" | Labels only that kind of element. |
-| "click 12", "12", "number twelve" | Clicks the element showing label 12. |
-| "hide labels", "do not show labels", "turn off numbers" | Removes the labels. |
+| “show labels” / “show numbers” | Number visible links, buttons, and inputs. |
+| “show links” / “show buttons” / “show inputs” | Label only that type of element. |
+| “click 12” / “number twelve” | Click the element with label 12. |
+| “hide labels” / “turn off numbers” | Remove the labels. |
+| “highlight 7” / “highlight the news link” | Highlight without activating an element. |
+| “click sign in” / “open the about us link” | Click a named element. |
+| “click the second link” / “click button 3” | Click by position among links or buttons. |
 
-Labels follow the page as you scroll. An element keeps its number while it stays on screen; elements that scroll into view take the lowest free numbers.
-
-### Clicking and focusing
-| Say | What happens |
-| --- | --- |
-| "click sign in", "open the about us link" | Clicks the element with that name (close mis-hearings are tolerated). |
-| "click the second link", "click button 3" | Clicks by position among links or buttons. |
-| "go to the search field", "focus 5" | Moves focus without clicking. |
-| "highlight 7", "highlight the news link" | Outlines an element without activating it. |
-
-If several elements match a name (for example three "Reply" buttons), only those get labels and you are asked to say the number of the one you want.
+Labels follow the page while scrolling. If several elements have the same name, PageSpeak labels the matching elements and asks you to choose by number.
 
 ### Forms
-| Say | What happens |
+
+| Say | Result |
 | --- | --- |
-| "type hello world" | Types into the focused field at the cursor. Saying "type" again adds to the text. |
-| "type hello into 5", "type cats in the search box" | Types into a specific field. |
-| "clear", "clear 5" | Empties a field. |
-| "next field", "previous field" | Moves between form fields. |
-| "check 3", "check remember me", "uncheck this" | Ticks or unticks a checkbox. |
-| "choose Canada", "choose Canada from country", "set country to Canada" | Picks a dropdown option. |
-| "press enter" / "submit", "press escape", "press tab" | Submits the form, closes a popup, or moves focus. |
+| “focus 5” / “go to the search field” | Focus a form field without clicking it. |
+| “type hello world” | Type into the focused field. |
+| “type cats in the search box” | Focus a matching field and type into it. |
+| “clear” / “clear 5” | Empty a field. |
+| “next field” / “previous field” | Move between form fields. |
+| “check 3” / “uncheck this” | Check or uncheck a checkbox. |
+| “choose Canada” / “set country to Canada” | Select a dropdown option. |
+| “press enter” / “press escape” / “press tab” | Send a keyboard action. |
 
-### Scrolling, reading and the browser
-| Say | What happens |
+### Reading, scrolling, and browser navigation
+
+| Say | Result |
 | --- | --- |
-| "scroll down" / "scroll up" | Scrolls one step. |
-| "scroll down 20 percent" | Scrolls by part of the page. |
-| "scroll to half of the page", "go to 75 percent" | Jumps to a position. |
-| "go to the top" / "go to the bottom" | Jumps to the start or end. |
-| "read this page", "stop" | Reads the title, headings and main text aloud, and stops reading. Voice commands are paused while reading, so use the **Stop** button to interrupt. |
-| "stop listening" | Turns the microphone off. |
-| "show headings" | Lists the page headings. |
-| "go back", "go forward", "reload" | Navigates. |
-| "new tab", "close tab" | Opens or closes a tab. |
-| "zoom in", "zoom out", "reset zoom" | Changes page zoom. |
-| "search for cute cats" | Searches with your default search engine. |
+| “read this page” | Read the page title, headings, and main text aloud. |
+| “stop” | Stop speech. Use the **Stop** button to interrupt page reading. |
+| “stop listening” | Turn off the microphone. |
+| “scroll down” / “scroll up” | Scroll one step. |
+| “scroll down 20 percent” | Scroll by a percentage of the page. |
+| “scroll to half of the page” / “go to 75 percent” | Jump to a page position. |
+| “go to the top” / “go to the bottom” | Jump to the start or end. |
+| “go back” / “go forward” / “reload” | Navigate the current tab. |
+| “new tab” / “close tab” | Open or close a browser tab. |
+| “zoom in” / “zoom out” / “reset zoom” | Change page zoom. |
+| “search for cute cats” | Search with the default search engine. |
 
-Polite wording such as "can you…" or "…please" is ignored, so "can you scroll down please" works.
+## Project structure
 
-## Local LLM command interpretation
+```text
+AHCI-PageSpeak/
+├── manifest.json       # Chrome extension configuration
+├── icons/
+│   └── pagespeak.png   # Extension and panel logo
+├── GUI/
+│   ├── overlay.js      # Voice panel, labels, and highlights
+│   ├── labels.js       # Number assignment for page elements
+│   └── styles.css      # Shadow-root panel styling
+└── VUI/
+    ├── speech.js       # Speech recognition and text-to-speech
+    ├── commandParser.js # Rule-based command parser
+    ├── ollamaParser.js # Local LLM command validation
+    ├── content.js      # Connects speech, UI, analysis, and actions
+    ├── pageAnalyzer.js # Finds and names interactive elements
+    ├── actionEngine.js # Performs webpage actions
+    ├── background.js   # Ollama, browser commands, and storage
+    └── logger.js       # Stores command results
+```
 
-The rule-based command parser is the fast path. If none of the recognized phrasings match a command, or the element named in a command is not on the page, the transcript and a short list of on-screen element names are sent to Ollama running on the same computer. The model's response is validated against the supported command actions before it runs. If Ollama is not installed, the rule-based commands still work.
+## Usage log
 
-1. Install Ollama at 'https://ollama.com/download' with your respective operating system.
+Voice commands are logged locally in `chrome.storage.local`, with a maximum of 2,000 entries, to support evaluation and user studies. Entries include the transcript, recognition alternatives, parser source, command, outcome, duration, and website hostname. Anything dictated with “type” is included under the `pagespeakLog` key.
 
-2. Download the configured model once in PowerShell:
+## Limitations
 
-	powershell:
-	ollama pull llama3.2:3b
+- Commands and labels currently cover the top-level page, not content inside iframes.
+- Custom non-`<select>` dropdowns are opened and operated by their visible names.
+- Speech recognition behavior depends on the browser and microphone permissions.
+- Restricted browser pages such as `chrome://extensions` cannot be controlled by content scripts.
 
-3. Copy the extension ID shown on the extension's card in `chrome://extensions`.
+## Development notes
 
-4. Ollama must allow this extension's origin. In Windows, open **Edit environment variables for your account** and add a user variable named `OLLAMA_ORIGINS` with this value, replacing the placeholder with the copied extension ID:
+The extension is loaded directly from the repository; no build step is required. After editing JavaScript, CSS, the manifest, or the logo:
 
-	text:
-	chrome-extension://YOUR_EXTENSION_ID
+1. Go to `chrome://extensions`.
+2. Click **Reload** on PageSpeak.
+3. Reload the webpage being tested.
 
-5. Quit Ollama from its system-tray menu and reopen it so the environment setting takes effect. Ollama for Windows normally runs in the background; do not start a second `ollama serve` process if it is already running.
-
-Ollama inference uses `http://127.0.0.1:11434` and does not require a paid model API. Requests time out after 15 seconds. The current speech transcription still uses the browser's Web Speech API, whose recognition may be provided by a browser service; local Ollama only guarantees that command interpretation stays on-device. The model and timeout can be changed in `VUI/background.js`.
-
-## Usage log for evaluation
-
-Every voice command is logged locally (in the extension's `chrome.storage.local`, at most 2,000 entries) to support user studies. Each entry records the transcript and the other recognition guesses, whether the rule-based parser or the local model produced the command, the command, the outcome (`success`, `failure`, `ambiguous`, `unknown` or `error`), the time from receiving the transcript to finishing the command, and the website's host name. Entries are stored under the `pagespeakLog` key and include anything dictated with "type".
-
-## Code overview
-
-`manifest.json` at the top level defines the extension and loads the files below.
-
-**`GUI/`: what is drawn on the page**
-
-| File | Purpose |
-| --- | --- |
-| `GUI/overlay.js` / `GUI/styles.css` | Panel, label badges and highlights, drawn inside a shadow root so page CSS cannot affect them. |
-| `GUI/labels.js` | Assigns and maintains label numbers. |
-
-**`VUI/`: understanding speech and acting on it**
-
-| File | Purpose |
-| --- | --- |
-| `VUI/speech.js` | Speech recognition (Web Speech API) and text-to-speech. |
-| `VUI/commandParser.js` | Rule-based parser from spoken text to command objects. |
-| `VUI/ollamaParser.js` | Validates commands returned by the local model. |
-| `VUI/content.js` | Wires everything together: receives transcripts, resolves targets, runs commands, logs results. |
-| `VUI/pageAnalyzer.js` | Finds interactive elements, their names and visibility, and does fuzzy name matching. |
-| `VUI/actionEngine.js` | Performs page actions: click, focus, type, clear, check, choose option, key presses, scrolling. |
-| `VUI/background.js` | Ollama requests, browser commands (tabs, zoom, search), and log storage. |
-| `VUI/logger.js` | Sends each command's result to the usage log. |
-
-Known limitations: labels and commands only cover the top-level page, not content inside iframes. Custom (non-`<select>`) dropdowns are opened by clicking them and their options by name.
-
-The PageSpeak browser-and-voice logo in `icons/pagespeak.png` is used for the browser extension and is displayed in the voice panel header. Reload the unpacked extension from `chrome://extensions` after changing the logo or manifest.
+The logo is used both as the Chrome extension icon and in the voice panel header. See [`icons/pagespeak.png`](icons/pagespeak.png) and [`GUI/overlay.js`](GUI/overlay.js).
