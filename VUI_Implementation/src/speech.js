@@ -1,12 +1,22 @@
 (() => {
   window.VUI = window.VUI || {};
 
+  const LANG = "en-US";
+  const MAX_ALTERNATIVES = 3;
+
   function getRecognitionConstructor() {
     return (
       window.SpeechRecognition ||
       window.webkitSpeechRecognition ||
       null
     );
+  }
+
+  function readAlternatives(result) {
+    return Array.from({ length: result.length }, (_, i) => ({
+      transcript: result[i].transcript.trim(),
+      confidence: result[i].confidence
+    })).filter(alternative => alternative.transcript);
   }
 
   class SpeechController {
@@ -26,8 +36,8 @@
       this.recognition = new Recognition();
       this.recognition.continuous = false;
       this.recognition.interimResults = false;
-      this.recognition.maxAlternatives = 1;
-      this.recognition.lang = "en-US";
+      this.recognition.maxAlternatives = MAX_ALTERNATIVES;
+      this.recognition.lang = LANG;
 
       this.recognition.onstart = () => {
         this.listening = true;
@@ -45,12 +55,13 @@
         }
       };
 
+      // Passes every recognition guess so the caller can pick the one that
+      // matches something on the page.
       this.recognition.onresult = (event) => {
-        const transcript =
-          event.results[0][0].transcript.trim();
+        const alternatives = readAlternatives(event.results[0]);
 
-        if (this.onResult) {
-          this.onResult(transcript);
+        if (alternatives.length && this.onResult) {
+          this.onResult(alternatives);
         }
       };
 
@@ -108,7 +119,7 @@
     const utterance =
       new SpeechSynthesisUtterance(text);
 
-    utterance.lang = "en-US";
+    utterance.lang = LANG;
     utterance.rate = 1;
     utterance.pitch = 1;
 

@@ -1,12 +1,15 @@
 {
   "manifest_version": 3,
   "name": "Voice Web Navigation",
-  "version": "0.1.0",
-  "description": "Voice-first webpage navigation using the Web Speech API.",
+  "version": "0.2.0",
+  "description": "Voice-first webpage navigation with numbered on-page labels.",
   "background": {
     "service_worker": "src/background.js"
   },
-  "permissions": [],
+  "permissions": [
+    "storage",
+    "search"
+  ],
   "host_permissions": [
     "https://*/*",
     "http://*/*",
@@ -18,19 +21,29 @@
         "https://*/*",
         "http://*/*"
       ],
-      "css": [
-        "src/styles.css"
-      ],
       "js": [
         "src/pageAnalyzer.js",
         "src/actionEngine.js",
         "src/commandParser.js",
         "src/ollamaParser.js",
         "src/speech.js",
+        "src/logger.js",
         "src/overlay.js",
+        "src/labels.js",
         "src/content.js"
       ],
       "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "src/styles.css"
+      ],
+      "matches": [
+        "https://*/*",
+        "http://*/*"
+      ]
     }
   ]
 }
