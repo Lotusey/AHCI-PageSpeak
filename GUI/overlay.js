@@ -30,9 +30,12 @@
 
     <section id="ps-panel" class="ps-panel" aria-label="Voice Web Navigation">
       <div class="ps-header">
-        <div>
-          <div class="ps-title">Voice Web Navigation</div>
-          <div class="ps-subtitle">Voice-first browser control</div>
+        <div class="ps-brand">
+          <img id="ps-logo" class="ps-logo" alt="" />
+          <div>
+            <div class="ps-title">Voice Web Navigation</div>
+            <div class="ps-subtitle">Voice-first browser control</div>
+          </div>
         </div>
         <button id="ps-close" class="ps-icon-button" title="Hide panel" aria-label="Hide panel">${ICONS.close}</button>
       </div>
@@ -100,6 +103,7 @@
     });
 
     root.append(stylesheet, container);
+    $("ps-logo").src = chrome.runtime.getURL("icons/pagespeak.png");
     layer = $("ps-layer");
 
     document.documentElement.appendChild(host);

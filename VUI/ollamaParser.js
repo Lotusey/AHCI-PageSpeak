@@ -7,6 +7,7 @@
   const FIELDS = {
     unknown: [],
     stopReading: [],
+    stopListening: [],
     readPage: [],
     back: [],
     forward: [],

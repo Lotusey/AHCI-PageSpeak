@@ -39,6 +39,7 @@
   }
 
   phrases(["stop", "stop reading", "be quiet", "stop talking", "quiet"], { action: "stopReading" });
+  phrases(["stop listening", "stop listening to me", "go to sleep", "turn off the microphone", "turn off microphone", "turn off the mic", "mic off"], { action: "stopListening" });
   phrases(["help", "what can i say", "what can i do", "show commands", "list commands", "show help"], { action: "help" });
   phrases(["read this page", "read the page", "read page"], { action: "readPage" });
   phrases(["go back", "back", "previous page"], { action: "back" });

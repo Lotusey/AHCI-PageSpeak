@@ -7,7 +7,7 @@ The project is a Chrome extension. It listens for a spoken command, maps it to a
 
 1. In Chrome, open `chrome://extensions`, enable Developer mode, choose **Load unpacked**, and select the `AHCI-PageSpeak` folder (the one containing `manifest.json`).
 2. Open any website. The Voice Web Navigation panel appears in the bottom-right corner.
-3. Press **Listen** and say a command.
+3. Press **Listen** and say a command. It keeps listening, so you can say as many commands as you like, with pauses in between, until you press **Stop**, press **Listen** again, or say "stop listening". Listening pauses while the extension is talking, so it does not mistake its own voice for a command, and while the tab is in the background.
 
 The first time you press **Listen** on a website, Chrome asks for permission to use the microphone.
 
@@ -55,7 +55,8 @@ If several elements match a name (for example three "Reply" buttons), only those
 | "scroll down 20 percent" | Scrolls by part of the page. |
 | "scroll to half of the page", "go to 75 percent" | Jumps to a position. |
 | "go to the top" / "go to the bottom" | Jumps to the start or end. |
-| "read this page", "stop" | Reads the title, headings and main text aloud, and stops reading. |
+| "read this page", "stop" | Reads the title, headings and main text aloud, and stops reading. Voice commands are paused while reading, so use the **Stop** button to interrupt. |
+| "stop listening" | Turns the microphone off. |
 | "show headings" | Lists the page headings. |
 | "go back", "go forward", "reload" | Navigates. |
 | "new tab", "close tab" | Opens or closes a tab. |
@@ -115,3 +116,5 @@ Every voice command is logged locally (in the extension's `chrome.storage.local`
 | `VUI/logger.js` | Sends each command's result to the usage log. |
 
 Known limitations: labels and commands only cover the top-level page, not content inside iframes. Custom (non-`<select>`) dropdowns are opened by clicking them and their options by name.
+
+The PageSpeak browser-and-voice logo in `icons/pagespeak.png` is used for the browser extension and is displayed in the voice panel header. Reload the unpacked extension from `chrome://extensions` after changing the logo or manifest.

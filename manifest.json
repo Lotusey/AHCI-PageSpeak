@@ -3,6 +3,12 @@
   "name": "Voice Web Navigation",
   "version": "0.2.0",
   "description": "Voice-first webpage navigation with numbered on-page labels.",
+  "icons": {
+    "16": "icons/pagespeak.png",
+    "32": "icons/pagespeak.png",
+    "48": "icons/pagespeak.png",
+    "128": "icons/pagespeak.png"
+  },
   "background": {
     "service_worker": "VUI/background.js"
   },
@@ -38,7 +44,8 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "GUI/styles.css"
+        "GUI/styles.css",
+        "icons/pagespeak.png"
       ],
       "matches": [
         "https://*/*",

@@ -29,13 +29,12 @@
     { title: "Forms", examples: ["type hello", "type hello into 5", "clear", "next field", "check 3", "choose Canada", "set country to Canada", "press enter"] },
     { title: "Scrolling", examples: ["scroll down", "scroll down 20 percent", "scroll to half of the page", "go to the top"] },
     { title: "Browser", examples: ["go back", "reload", "new tab", "close tab", "zoom in", "reset zoom", "search for cats"] },
-    { title: "Other", examples: ["read this page", "stop", "show headings", "what can I say"] }
+    { title: "Other", examples: ["read this page", "stop", "show headings", "stop listening", "what can I say"] }
   ];
 
   const SPEECH_ERRORS = {
     "not-allowed": "Microphone permission was denied.",
-    "no-speech": "I did not hear anything.",
-    "network": "Speech recognition could not reach its recognition service.",
+    "network": "Speech recognition could not reach its recognition service. Press Listen to try again.",
     "audio-capture": "No microphone was available.",
     "service-not-allowed": "Speech recognition is not allowed on this page."
   };
@@ -497,6 +496,10 @@
       case "cancel":
         return { outcome: "cancelled", message: "Okay." };
 
+      case "stopListening":
+        speech.stop();
+        return ok("Stopped listening.");
+
       default:
         return {
           outcome: "unknown",
@@ -640,12 +643,16 @@
     Overlay.setListening(state === "listening");
   };
 
+  // Commands said in quick succession run one after another, in order.
+  let commandQueue = Promise.resolve();
+
   speech.onResult = alternatives => {
-    handleSpeech(alternatives);
+    commandQueue = commandQueue
+      .then(() => handleSpeech(alternatives))
+      .catch(error => console.error("Voice command failed:", error));
   };
 
   speech.onError = error => {
-    if (error === "aborted") return;
     Overlay.setStatus(SPEECH_ERRORS[error] || `Speech recognition error: ${error}`);
   };
 
@@ -659,8 +666,15 @@
     button.addEventListener("click", handler);
   }
 
+  // Listen keeps listening until pressed again, Stop is pressed, or the
+  // user says "stop listening".
   onPanelButton("ps-mic", () => {
-    speech.start();
+    if (speech.isListening()) {
+      speech.stop();
+      Overlay.setStatus("Stopped listening");
+    } else {
+      speech.start();
+    }
   });
 
   onPanelButton("ps-stop", () => {
