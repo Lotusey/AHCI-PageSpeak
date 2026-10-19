@@ -1,10 +1,10 @@
 # PageSpeak
 
 <p align="center">
-  <img src="icons/pagespeak.png" alt="PageSpeak logo" width="180">
+  <img src="icons/pagespeak-readme.png" alt="PageSpeak logo" width="180">
 </p>
 
-<p align="center"><strong>Voice-first webpage navigation for Chrome</strong></p>
+<p align="center"><strong>Voice-first webpage navigation any browser</strong></p>
 
 PageSpeak combines a voice user interface (VUI) with an on-page graphical user interface (GUI) to make webpages easier to browse. Speak a command to scroll, read, click, focus, type, search, or navigate. The extension can also place numbered labels on visible links, buttons, and form fields so you can reach them by voice.
 
