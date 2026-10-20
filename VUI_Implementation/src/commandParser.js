@@ -1,6 +1,8 @@
 (() => {
+  // Make the built-in voice-command parser available to the controller.
   window.VUI = window.VUI || {};
 
+  // Normalize speech text before comparing it with known command patterns.
   function normalize(text) {
     return text
       .toLowerCase()
@@ -9,10 +11,25 @@
       .trim();
   }
 
+  // Convert spoken or numeric ordinals to one-based list positions.
   function numberFromText(text) {
     const numberWords = {
       first: 1, second: 2, third: 3, fourth: 4, fifth: 5,
-      sixth: 6, seventh: 7, eighth: 8, ninth: 9, tenth: 10
+      sixth: 6, seventh: 7, eighth: 8, ninth: 9, tenth: 10,
+      eleventh: 11, twelfth: 12, thirteenth: 13, fourteenth: 14, fifteenth: 15,
+      sixteenth: 16, seventeenth: 17, eigteenth: 18, nineteenth: 19, twentieth: 20,
+      twentyfirst: 21, twentysecond: 22, twentythird: 23, twentyfourth: 24, twentyfifth: 25,
+      twentysixth: 26, twentyseventh: 27, twentyeigth: 28, twentyninth: 29, thirtieth: 30,
+      thirtyfirst: 31, thirtysecond: 32, thirtythird: 33, thirtyfourth: 34, thirtyfifth: 35,
+      thirtysixth: 36, thirtyseventh: 37, thirtyeigth: 38, thirtyninth: 39, fortieth: 40,
+      fortyfirst: 41, fortysecond: 42, fortythird: 43, fortyfourth: 44, fortyfifth: 45,
+      fortysixth: 46, fortyseventh: 47, fortyeigth: 48, fortyninth: 49, fitieth: 50,
+      fiftyfirst: 51, fiftysecond: 52, fiftythird: 53, fiftyfourth: 54, fiftyfifth: 55,
+      fiftysixth: 56, fiftyseventh: 57, fiftyeigth: 58, fiftyninth: 59, sixtieth: 60,
+      sixtyfirst: 61, sixtysecond: 62, sixtythird: 63, sixtyfourth: 64, sixtyfifth: 65,
+      sixtysixth: 66, sixtyseventh: 67, sixtyeigth: 68, sixtyninth: 69, seventieth: 70,
+      seventyfirst: 71, seventysecond: 72, seventythird: 73, seventyfourth: 74, seventyfifth: 75,
+      seventysixth: 76, seventyseventh: 77, seventyeigth: 78, seventyninth: 79, eightieth: 80
     };
 
     const numeric = text.match(/\b(\d+)\b/);
@@ -25,6 +42,7 @@
     return null;
   }
 
+  // Extract an optional link/button category and index from a target phrase.
   function elementReference(value) {
     let target = value.trim();
     let targetType = null;
@@ -46,6 +64,8 @@
     };
   }
 
+  // Match supported phrases to structured actions and their parameters.
+  // Main command list
   function parse(text) {
     const command = normalize(text);
 
@@ -75,7 +95,7 @@
       return { action: "forward" };
     }
 
-    // Percentage-based scrolling
+    // Parse relative percentage scrolling and absolute page positions.
     const scrollDownPercent = command.match(
       /^scroll down (\d{1,3})%$/
     );
@@ -300,6 +320,7 @@
     };
   }
 
+  // Publish the deterministic parser used before local-model interpretation.
   window.VUI.CommandParser = {
     parse
   };

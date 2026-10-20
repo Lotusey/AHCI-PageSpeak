@@ -1,7 +1,9 @@
 (() => {
+  // Provide UI helpers for the voice-navigation overlay.
   window.VUI = window.VUI || {};
   const highlightedElements = new Set();
 
+  // Create the panel and its controls once per page.
   function createOverlay() {
     if (document.getElementById("vui-overlay")) {
       return;
@@ -55,6 +57,7 @@
     return overlay;
   }
 
+  // Update the short status message shown in the panel.
   function setStatus(status) {
     const element = document.getElementById("vui-status");
 
@@ -63,6 +66,7 @@
     }
   }
 
+  // Show the latest speech-recognition transcript.
   function setTranscript(text) {
     const element =
       document.getElementById("vui-transcript");
@@ -72,6 +76,7 @@
     }
   }
 
+  // Render numbered page-element results or an empty-results message.
   function showList(items) {
     const container =
       document.getElementById("vui-results");
@@ -105,6 +110,7 @@
     });
   }
 
+  // Remove all current result rows from the panel.
   function clearResults() {
     const container =
       document.getElementById("vui-results");
@@ -114,6 +120,7 @@
     }
   }
 
+  // Bring one matched element into view and mark it for visual emphasis.
   function highlightElement(element) {
     if (!element) {
       return;
@@ -128,6 +135,7 @@
     highlightedElements.add(element);
   }
 
+  // Mark every element in a displayed list for visual emphasis.
   function highlightVisibleElements(items) {
     items.forEach(item => {
       const element = item.element;
@@ -136,6 +144,7 @@
     });
   }
 
+  // Remove emphasis from all elements previously highlighted by the overlay.
   function clearHighlights() {
     highlightedElements.forEach(element => {
       element.classList.remove("vui-highlight");
@@ -143,6 +152,7 @@
     highlightedElements.clear();
   }
 
+  // Publish overlay operations for the command controller.
   window.VUI.Overlay = {
     createOverlay,
     setStatus,

@@ -1,12 +1,15 @@
 (() => {
+  // Expose page-inspection helpers to the other content scripts.
   window.VUI = window.VUI || {};
 
+  // Exclude input types that are either sensitive or not user-editable.
   const ignoredInputTypes = new Set([
     "password",
     "hidden",
     "file"
   ]);
 
+  // Check whether an element is rendered and has a non-zero size.
   function isVisible(element) {
     if (!element) return false;
 
@@ -22,6 +25,7 @@
     );
   }
 
+  // Check visibility and whether any part of the element is on screen.
   function isInViewport(element) {
     if (!isVisible(element)) return false;
 
@@ -35,12 +39,14 @@
     );
   }
 
+  // Normalize whitespace so names are easier to compare and announce.
   function cleanText(value) {
     return (value || "")
       .replace(/\s+/g, " ")
       .trim();
   }
 
+  // Derive an accessible name from common ARIA and HTML labeling sources.
   function getName(element) {
     const ariaLabel = cleanText(element.getAttribute("aria-label"));
     if (ariaLabel) return ariaLabel;
@@ -66,6 +72,7 @@
     return cleanText(element.innerText || element.textContent);
   }
 
+  // Use an explicit ARIA role when available, otherwise infer from its tag.
   function getRole(element) {
     const explicitRole = cleanText(element.getAttribute("role"));
     if (explicitRole) return explicitRole;
@@ -83,6 +90,7 @@
     return tag;
   }
 
+  // Find visible elements for a supported page-element category.
   function getElementsByType(type) {
     const selectors = {
       links: "a[href]",
@@ -104,11 +112,13 @@
       }));
   }
 
+  // Restrict a category list to elements currently in the viewport.
   function getVisibleElementsByType(type) {
     return getElementsByType(type)
       .filter(item => isInViewport(item.element));
   }
 
+  // Collect visible links, controls, and other keyboard-focusable elements.
   function getInteractiveElements() {
     const selector = [
       "a[href]",
@@ -133,6 +143,7 @@
       .filter(item => item.name);
   }
 
+  // Find the first matching control by accessible name, optionally by type.
   function findByName(query, type = null) {
     const normalized = cleanText(query).toLowerCase();
 
@@ -153,6 +164,7 @@
     );
   }
 
+  // Build a short text summary from the title, headings, and paragraphs.
   function getPageSummary() {
     const title = cleanText(document.title);
     const headings = getElementsByType("headings")
@@ -173,6 +185,7 @@
     };
   }
 
+  // Publish the page-inspection API used by voice commands.
   window.VUI.PageAnalyzer = {
     isVisible,
     cleanText,

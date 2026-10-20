@@ -1,6 +1,8 @@
 (() => {
+  // Expose local-model command parsing to the content controller.
   window.VUI = window.VUI || {};
 
+  // Define the fields permitted for each normalized command action.
   const allowedKeys = {
     unknown: ["action"],
     hideLinks: ["action"],
@@ -21,6 +23,7 @@
     type: ["action", "text"]
   };
 
+  // Map common model action synonyms to supported action names.
   const actionAliases = {
     open: "click",
     activate: "click",
@@ -28,6 +31,7 @@
     press: "click"
   };
 
+  // Convert spoken ordinal words into one-based element indexes.
   const ordinalNumbers = {
     first: 1, one: 1, second: 2, two: 2, third: 3, three: 3,
     fourth: 4, four: 4, fifth: 5, five: 5, sixth: 6, six: 6,
@@ -35,21 +39,25 @@
     tenth: 10, ten: 10
   };
 
+  // Validate and normalize data returned by the local model.
   function isObject(value) {
     return value !== null && typeof value === "object" && !Array.isArray(value);
   }
 
+  // Reject command objects containing fields outside their action schema.
   function hasOnlyAllowedKeys(command) {
     const keys = allowedKeys[command.action];
     return keys && Object.keys(command).every(key => keys.includes(key));
   }
 
+  // Convert a numeric or spoken ordinal into its one-based value.
   function ordinalValue(value) {
     if (ordinalNumbers[value]) return ordinalNumbers[value];
     const numeric = value.match(/^(\d+)(?:st|nd|rd|th)?$/);
     return numeric ? Number(numeric[1]) : null;
   }
 
+  // Separate category and ordinal words from spoken element references.
   function normalizeTarget(target, action, existingIndex) {
     if (typeof target !== "string") return { target, index: existingIndex };
 
@@ -100,6 +108,7 @@
     };
   }
 
+  // Apply action aliases and normalize any target-related fields.
   function normalizeCommand(command) {
     if (!isObject(command) || typeof command.action !== "string") return null;
     if (command.action === "unknown") return { action: "unknown" };
@@ -153,6 +162,7 @@
     return normalized;
   }
 
+  // Enforce supported action shapes and ensure referenced targets exist.
   function isValidCommand(command, targets) {
     if (!isObject(command) || !hasOnlyAllowedKeys(command)) return false;
     if (["unknown", "hideLinks", "listVisibleLinks"].includes(command.action)) {
@@ -207,6 +217,7 @@
     return true;
   }
 
+  // Ask the extension worker to interpret speech, then validate its reply.
   function parse(transcript, targets) {
     return new Promise((resolve, reject) => {
       chrome.runtime.sendMessage(
@@ -241,5 +252,6 @@
     });
   }
 
+  // Publish the validated local-model parser.
   window.VUI.OllamaParser = { parse };
 })();

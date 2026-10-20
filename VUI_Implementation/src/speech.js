@@ -1,6 +1,8 @@
 (() => {
+  // Share speech features with the other content scripts.
   window.VUI = window.VUI || {};
 
+  // Select the browser-specific Web Speech recognition implementation.
   function getRecognitionConstructor() {
     return (
       window.SpeechRecognition ||
@@ -9,6 +11,7 @@
     );
   }
 
+  // Manage microphone recognition and expose speech events to the UI.
   class SpeechController {
     constructor() {
       this.recognition = null;
@@ -19,10 +22,12 @@
 
       const Recognition = getRecognitionConstructor();
 
+      // Leave recognition unavailable when the browser lacks speech support.
       if (!Recognition) {
         return;
       }
 
+      // Configure one-shot English recognition and forward its lifecycle events.
       this.recognition = new Recognition();
       this.recognition.continuous = false;
       this.recognition.interimResults = false;
@@ -67,10 +72,12 @@
       };
     }
 
+    // Report whether the browser created a recognition instance.
     isSupported() {
       return this.recognition !== null;
     }
 
+    // Start listening unless recognition is unavailable or already active.
     start() {
       if (!this.recognition || this.listening) {
         return;
@@ -85,6 +92,7 @@
       }
     }
 
+    // Stop active recognition; the browser may already have stopped it.
     stop() {
       if (!this.recognition) {
         return;
@@ -98,6 +106,7 @@
     }
   }
 
+  // Speak a message aloud, replacing any speech that is already playing.
   function speak(text) {
     if (!("speechSynthesis" in window)) {
       return;
@@ -115,12 +124,14 @@
     window.speechSynthesis.speak(utterance);
   }
 
+  // Cancel current speech synthesis without starting another utterance.
   function stopSpeaking() {
     if ("speechSynthesis" in window) {
       window.speechSynthesis.cancel();
     }
   }
 
+  // Publish the controller and speech helpers for the other scripts.
   window.VUI.SpeechController = SpeechController;
   window.VUI.speak = speak;
   window.VUI.stopSpeaking = stopSpeaking;

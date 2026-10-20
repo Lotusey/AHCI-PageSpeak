@@ -1,6 +1,8 @@
 (() => {
+  // Coordinate speech recognition, command handling, page actions, and UI.
   window.VUI = window.VUI || {};
 
+  // Build the voice panel and initialize its speech and control references.
   VUI.Overlay.createOverlay();
 
   const speech = new VUI.SpeechController();
@@ -16,17 +18,20 @@
 
   let shownListType = null;
 
+  // Explain when speech recognition cannot be used in this browser.
   if (!speech.isSupported()) {
     VUI.Overlay.setStatus(
       "Speech recognition is not supported in this browser."
     );
   }
 
+  // Keep the interface status and spoken confirmation in sync.
   function speakAndShow(message) {
     VUI.Overlay.setStatus(message);
     VUI.speak(message);
   }
 
+  // Retrieve a categorized list of targets for parsing or execution.
   function getTargetList(type) {
     if (type === "focusables") {
       return VUI.PageAnalyzer.getInteractiveElements();
@@ -35,6 +40,7 @@
     return VUI.PageAnalyzer.getElementsByType(type);
   }
 
+  // Execute a parsed action and report its outcome through the interface.
   function executeCommand(command) {
     switch (command.action) {
       case "stopReading":
@@ -323,6 +329,7 @@
     }
   }
 
+  // Reflect microphone recognition state in the overlay controls.
   speech.onStateChange = (state) => {
     if (state === "listening") {
       VUI.Overlay.setStatus("Listening...");
@@ -343,6 +350,7 @@
     }
   };
 
+  // Parse recognized speech locally first, then use Ollama as a fallback.
   speech.onResult = (transcript) => {
     VUI.Overlay.clearHighlights();
     VUI.Overlay.setTranscript(transcript);
@@ -385,6 +393,7 @@
       });
   };
 
+  // Translate browser recognition errors into messages for the user.
   speech.onError = (error) => {
     const messages = {
       "not-allowed":
@@ -404,6 +413,7 @@
     VUI.Overlay.setStatus(message);
   };
 
+  // Connect panel buttons to listening, stopping, and close/reopen behavior.
   micButton.addEventListener("click", () => {
     speech.start();
   });
@@ -431,6 +441,7 @@
     document.body.appendChild(reopen);
   });
 
+  // Display the initial state based on browser speech-recognition support.
   VUI.Overlay.setStatus(
     speech.isSupported()
       ? "Ready"
