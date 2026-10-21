@@ -5,18 +5,18 @@
   // background worker (chrome.storage.local) and never leave the computer.
 
   function record(entry) {
-    try {
-      chrome.runtime.sendMessage({
-        type: "VUI_LOG_APPEND",
-        entry: {
-          time: new Date().toISOString(),
-          host: location.hostname,
-          ...entry
-        }
-      }).catch(() => {});
-    } catch (error) {
-      // Thrown when the extension was reloaded after this page loaded.
-    }
+    return Promise.resolve().then(() => chrome.runtime.sendMessage({
+      type: "VUI_LOG_APPEND",
+      entry: {
+        time: new Date().toISOString(),
+        host: location.hostname,
+        ...entry
+      }
+    }).then(response => {
+      if (response?.error) {
+        throw new Error(response.error);
+      }
+    }));
   }
 
   window.VUI.Logger = {

@@ -1,19 +1,35 @@
-/* Loaded inside the overlay's shadow root, so these rules never touch the page. */
 
-* {
+/* =========================================================
+   PageSpeak - GUI Styles
+   Used by the overlay and the on-page labels/highlights.
+   ========================================================= */
+
+/* ---- Shared defaults ---- */
+
+.ps-layer,
+.ps-badge,
+.ps-highlight,
+.ps-panel,
+#vui-overlay,
+.ps-panel *,
+#vui-overlay * {
   box-sizing: border-box;
 }
 
-[hidden] {
+.ps-panel [hidden],
+#vui-overlay [hidden] {
   display: none !important;
 }
 
-/* ---- Labels and highlights over the page ---- */
+/* =========================================================
+   On-page labels and highlights
+   ========================================================= */
 
 .ps-layer {
   position: fixed;
   inset: 0;
   overflow: hidden;
+  z-index: 2147483646;
   pointer-events: none;
 }
 
@@ -27,11 +43,11 @@
   padding: 0 4px;
 
   border-radius: 6px;
-
   background: #172033;
   color: white;
 
-  font: 700 11px/18px Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font: 700 11px/18px Inter, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
   text-align: center;
 
   box-shadow:
@@ -65,15 +81,28 @@
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.35);
 }
 
-/* ---- Panel ---- */
+/* Outline used by the VUI when focusing a page element. */
+.vui-highlight {
+  outline: 4px solid #ffb000 !important;
+  outline-offset: 4px !important;
+  transition: outline 0.2s ease !important;
+}
 
-.ps-panel {
+/* =========================================================
+   Main overlay panel
+   ========================================================= */
+
+/* Support both naming conventions during the merge. */
+.ps-panel,
+#vui-overlay {
   position: fixed;
   right: 24px;
   bottom: 24px;
+
   width: 360px;
   max-height: 70vh;
   overflow: auto;
+  z-index: 2147483647;
 
   padding: 18px;
 
@@ -93,18 +122,29 @@
   border: 1px solid rgba(20, 30, 50, 0.15);
   border-radius: 18px;
 
-  box-shadow:
-    0 18px 50px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
 
   backdrop-filter: blur(12px);
   pointer-events: auto;
 }
 
-.ps-panel button {
+/* Keep sizing consistent inside the panel. */
+.ps-panel *,
+#vui-overlay * {
+  box-sizing: border-box;
+}
+
+.ps-panel button,
+#vui-overlay button {
   font-family: inherit;
 }
 
-.ps-header {
+/* =========================================================
+   Header
+   ========================================================= */
+
+.ps-header,
+.vui-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -131,7 +171,18 @@
   font-weight: 700;
 }
 
+.vui-title {
+  font-size: 17px;
+  font-weight: 700;
+}
+
 .ps-subtitle {
+  margin-top: 2px;
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.vui-subtitle {
   margin-top: 2px;
   font-size: 12px;
   opacity: 0.6;
@@ -166,12 +217,30 @@
   cursor: pointer;
 }
 
-.ps-status {
+.vui-icon-button {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: #edf0f5;
+  color: #172033;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* =========================================================
+   Status and transcript
+   ========================================================= */
+
+.ps-status,
+.vui-status {
   margin-top: 16px;
   padding: 10px 12px;
 
   border-radius: 10px;
-
   background: #f1f4f8;
 
   font-size: 13px;
@@ -188,6 +257,14 @@
   opacity: 0.55;
 }
 
+.vui-transcript-label {
+  margin-top: 16px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
 .ps-transcript {
   min-height: 42px;
 
@@ -198,11 +275,29 @@
   border-radius: 10px;
 
   font-size: 14px;
-
   background: white;
+
+  overflow-wrap: anywhere;
 }
 
-.ps-results {
+.vui-transcript {
+  min-height: 42px;
+  margin-top: 6px;
+  padding: 10px 12px;
+  border: 1px solid #e1e5eb;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.4;
+  background: white;
+  overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   Results list
+   ========================================================= */
+
+.ps-results,
+.vui-results {
   margin-top: 12px;
 }
 
@@ -212,11 +307,19 @@
   align-items: center;
 
   gap: 8px;
-
   padding: 8px 6px;
 
   border-bottom: 1px solid #edf0f4;
+  font-size: 12px;
+}
 
+.vui-result-row {
+  display: grid;
+  grid-template-columns: 28px 70px 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 6px;
+  border-bottom: 1px solid #edf0f4;
   font-size: 12px;
 }
 
@@ -229,10 +332,20 @@
   padding: 0 4px;
 
   border-radius: 6px;
-
   background: #172033;
   color: white;
 
+  font-weight: 700;
+}
+
+.vui-result-number {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #172033;
+  color: white;
   font-weight: 700;
 }
 
@@ -243,9 +356,24 @@
   font-weight: 700;
 }
 
+.vui-result-role {
+  opacity: 0.55;
+  text-transform: uppercase;
+  font-size: 9px;
+  font-weight: 700;
+}
+
 .ps-result-name {
   overflow-wrap: anywhere;
 }
+
+.vui-result-name {
+  overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   Help and example commands
+   ========================================================= */
 
 .ps-help-section {
   padding: 8px 2px;
@@ -264,7 +392,22 @@
   font-size: 12px;
 }
 
-.ps-controls {
+.ps-help,
+.vui-help {
+  margin-top: 12px;
+
+  font-size: 11px;
+  line-height: 1.5;
+
+  opacity: 0.6;
+}
+
+/* =========================================================
+   Microphone and stop controls
+   ========================================================= */
+
+.ps-controls,
+.vui-controls {
   display: flex;
   gap: 8px;
 
@@ -272,7 +415,9 @@
 }
 
 .ps-mic-button,
-.ps-secondary-button {
+.ps-secondary-button,
+.vui-mic-button,
+.vui-secondary-button {
   min-height: 42px;
 
   border: none;
@@ -289,9 +434,18 @@
   display: flex;
   justify-content: center;
   align-items: center;
-
   gap: 8px;
 
+  background: #172033;
+  color: white;
+}
+
+.vui-mic-button {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
   background: #172033;
   color: white;
 }
@@ -300,32 +454,28 @@
   background: #b42318;
 }
 
-.ps-secondary-button {
+.vui-mic-button.vui-listening {
+  background: #b42318;
+}
+
+.ps-secondary-button,
+.vui-secondary-button {
   padding: 0 14px;
 
   background: #edf0f5;
   color: #172033;
 }
 
-.ps-help {
-  margin-top: 12px;
+/* =========================================================
+   Reopen button
+   ========================================================= */
 
-  font-size: 11px;
-  line-height: 1.5;
-
-  opacity: 0.6;
-}
-
-.ps-panel :focus-visible,
-.ps-reopen:focus-visible {
-  outline: 3px solid #ffb000;
-  outline-offset: 2px;
-}
-
-.ps-reopen {
+.ps-reopen,
+#vui-reopen {
   position: fixed;
   right: 24px;
   bottom: 24px;
+  z-index: 2147483647;
 
   display: flex;
   align-items: center;
@@ -350,16 +500,40 @@
   font-weight: 700;
   cursor: pointer;
 
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
   pointer-events: auto;
 }
 
+/* =========================================================
+   Keyboard focus indicators
+   ========================================================= */
+
+.ps-panel :focus-visible,
+#vui-overlay :focus-visible,
+.ps-reopen:focus-visible,
+#vui-reopen:focus-visible {
+  outline: 3px solid #ffb000;
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   Responsive layout
+   ========================================================= */
+
 @media (max-width: 600px) {
-  .ps-panel {
+  .ps-panel,
+  #vui-overlay {
     right: 12px;
     bottom: 12px;
     left: 12px;
+
     width: auto;
+    max-width: none;
+  }
+
+  .ps-reopen,
+  #vui-reopen {
+    right: 12px;
+    bottom: 12px;
   }
 }

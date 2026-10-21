@@ -27,6 +27,9 @@
         "https://*/*",
         "http://*/*"
       ],
+      "css": [
+        "GUI/styles.css"
+      ],
       "js": [
         "VUI/pageAnalyzer.js",
         "VUI/actionEngine.js",
@@ -44,7 +47,6 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "GUI/styles.css",
         "icons/pagespeak.png"
       ],
       "matches": [
