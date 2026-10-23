@@ -104,40 +104,7 @@
     scrollTimer = setTimeout(refresh, 200);
   }
 
-  function onMutation(mutations) {
-    const relevantMutation = mutations.some(mutation => {
-      const target = mutation.target.nodeType === Node.ELEMENT_NODE
-        ? mutation.target
-        : mutation.target.parentElement;
-
-      if (target?.closest("#ps-label-layer, #vui-overlay, #vui-reopen")) {
-        return false;
-      }
-
-      if (mutation.type === "childList") {
-        const changedNodes = [
-          ...mutation.addedNodes,
-          ...mutation.removedNodes
-        ];
-
-        if (
-          changedNodes.length &&
-          changedNodes.every(node => {
-            const element = node.nodeType === Node.ELEMENT_NODE
-              ? node
-              : node.parentElement;
-            return element?.closest("#ps-label-layer, #vui-overlay, #vui-reopen");
-          })
-        ) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-
-    if (!relevantMutation) return;
-
+  function onMutation() {
     // Throttle rather than debounce, so pages that animate constantly still refresh.
     if (!mutationTimer) {
       mutationTimer = setTimeout(refresh, 400);
